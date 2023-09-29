@@ -1,40 +1,35 @@
 import Map from './Maps'
-import RestaurantList from './RestaurantList';
+import RestaurantList from './PlaceList';
+import Navbar from './Navbar';
 import React, { useEffect, useState } from 'react';
-
+import axios from 'axios';
 import './App.css';
+import PlaceList from './PlaceList';
 
 const apikey = 'lG6eFVH2U5Xv-svYuYp4_M2_uxdn2hYGPI_CLW8Wt8E'
 // const userPosition = { lat: 64.1472, lng: -21.9398 }
 
-const restaurantList = [
-  {
-    name: "The Fish Market",
-    location: { lat: 64.1508, lng: -21.9536 },
-  },
-  {
-    name: "Bæjarins Beztu Pylsur",
-    location: { lat: 64.1502, lng: -21.9519 },
-  },
-  {
-    name: "Grillmarkadurinn",
-    location: { lat: 64.1475, lng: -21.9347 },
-  },
-  {
-    name: "Kol Restaurant",
-    location: { lat: 64.1494, lng: -21.9337 },
-  },
-];
+
+const emergencyCategoryList =
+  [
+    { name: "Towing Service", id: '700-7200-0278' },
+    { name: "Police Station", id: '700-7300-0111' },
+    { name: "Fire Department", id: '700-7300-0113' },
+    { name: "Ambulance Services", id: '700-7300-0280' },
+    { name: "Healthcare", id: '800-8000-0000' },
+    { name: "Hospital", id: '800-8000-0159' },
+    { name: "Emergency Room", id: '800-8000-0325' }
+  ]
 
 
 function App() {
-  const [restaurantPosition, setRestaurantPosition] = useState(null);
+  const [placePosition, setPlacePosition] = useState(null);
+  const [list, setList] = useState([])
   const [userPosition, setUserPosition] = useState(null);
   const [loading, setLoading] = useState(true);
 
-
   const onClickHandler_ = (location) => {
-    setRestaurantPosition(location);
+    setPlacePosition(location);
   }
 
   // useEffect
@@ -49,7 +44,6 @@ function App() {
                 lng: parseFloat(position.coords.longitude)
               }
             );
-            console.log(userPosition);
             setLoading(false);
           },
           (error) => {
@@ -68,12 +62,32 @@ function App() {
     return <div>Loading (Fetching User Location).....</div>
   }
 
+  const categoryHandler = (category) => {
+    const url = `https://browse.search.hereapi.com/v1/browse?at=${userPosition.lat},${userPosition.lng}&categories=${category}&apiKey=${apikey}`
+
+    axios.get(url, {
+      withCredentials: false,
+    })
+      .then(response => {
+        response.data.items.map((item) => {
+          setList((prevList) => {
+            return [...prevList, {
+              name: item.title,
+              location: item.position
+            }]
+          })
+        })
+      })
+  }
+
   return (
     <div className="App">
-      <RestaurantList list={restaurantList} onClickHandler={onClickHandler_} />
+      <Navbar list={emergencyCategoryList} categoryHandler={categoryHandler} />
+      <PlaceList list={list} onClickHandler={onClickHandler_} />
       <Map apikey={apikey}
         userPosition={userPosition}
-        restaurantPosition={restaurantPosition}
+        placePosition={placePosition}
+        list={list}
       />
     </div>
   );

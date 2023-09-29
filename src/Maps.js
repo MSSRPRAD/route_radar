@@ -70,7 +70,7 @@ const Map = (props) => {
     const mapRef = useRef(null);
     const map = useRef(null);
     const platform = useRef(null);
-    const { apikey, userPosition, restaurantPosition } = props;
+    const { apikey, userPosition, placePosition, list } = props;
 
     const makeNewMap = () => {
         platform.current = new H.service.Platform({ apikey });
@@ -108,6 +108,15 @@ const Map = (props) => {
             })
         ]);
 
+        list.map((item) => {
+            newMap.addObjects([
+                // Add a marker for the user
+                new H.map.Marker(item.location, {
+                    icon: getMarkerIcon('green')
+                })
+            ])
+        })
+
         map.current = newMap;
 
 
@@ -116,9 +125,8 @@ const Map = (props) => {
     useEffect(
         () => {
 
-            if (userPosition && restaurantPosition) {
-                // makeNewMap()
-                calculateRoute(platform.current, map.current, userPosition, restaurantPosition);
+            if (userPosition && placePosition) {
+                calculateRoute(platform.current, map.current, userPosition, placePosition);
             }
 
 
@@ -126,7 +134,7 @@ const Map = (props) => {
                 makeNewMap();
             }
         }
-        , [apikey, userPosition, restaurantPosition]
+        , [apikey, userPosition, placePosition, list]
     );
 
     return <div style={{ width: "100%", height: "500px" }} ref={mapRef} />;

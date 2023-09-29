@@ -1,4 +1,4 @@
-const RestaurantEntry = (props) => {
+const PlaceEntry = (props) => {
     const handleClick = () => {
         props.onClickHandler(props.data.location);
     }
@@ -19,17 +19,19 @@ const RestaurantEntry = (props) => {
     )
 }
 
-const RestaurantList = (props) => {
+const PlaceList = (props) => {
     const entries = props.list;
+
     const list = entries.map((entry) => {
-        return <RestaurantEntry data={entry} onClickHandler={props.onClickHandler} key={Math.random()} />
+        return <PlaceEntry key={Math.random()} data={entry} onClickHandler={props.onClickHandler} />
     })
 
+
     return (
-        <div id="restaurant-list" style={{ 'display': 'grid' }} >
+        <div id="place-list" style={{ 'display': 'grid' }} >
             {list}
         </div>
     )
 }
 
-export default RestaurantList;
+export default PlaceList;
