@@ -63,22 +63,23 @@ function App() {
   }
 
   const categoryHandler = (category) => {
-    const url = `https://browse.search.hereapi.com/v1/browse?at=${userPosition.lat},${userPosition.lng}&categories=${category}&apiKey=${apikey}`
-
-    axios.get(url, {
-      withCredentials: false,
-    })
+    // category = '700-7300,800-8000';
+    const url = `https://browse.search.hereapi.com/v1/browse?at=${userPosition.lat},${userPosition.lng}&categories=${category}&apiKey=${apikey}`;
+    console.log("requesting with: " + url);
+    axios.get(url, { withCredentials: false })
       .then(response => {
-        response.data.items.map((item) => {
-          setList((prevList) => {
-            return [...prevList, {
-              name: item.title,
-              location: item.position
-            }]
-          })
-        })
+        // Clear the previous list
+        setList([]);
+        // Set the new list
+        setList(response.data.items.map(item => ({
+          name: item.title,
+          location: item.position
+        })));
       })
-  }
+      .catch(error => {
+        console.error(error);
+      });
+  };
 
   return (
     <div className="App">
